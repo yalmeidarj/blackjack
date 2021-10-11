@@ -12,115 +12,119 @@
 
 ##########################################
 import random
-# global end_of_game, is_greater_21 
-
-cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-
 user_score_list = []
-def user_get_another_card(cards):
-	"""Return a random card value"""
-	card = random.choice(cards)
-	user_score_list.append(card)
-	user_total_score = sum(user_score_list)
-	if user_total_score > 21:
-		end_of_game = True
-		return end_of_game		
-	return user_total_score
-
 dealer_score_list = []
-def dealer_get_another_card(cards):
-	"""Return a random card value"""
-	card = random.choice(cards) 
-	dealer_score_list.append(card)
-	dealer_total_score = sum(dealer_score_list)
-	if dealer_total_score > 21:
-		end_of_game = True
-		return end_of_game
-	return dealer_total_score  	 
-players = {"user":[user_score_list],
-"dealer":[dealer_score_list]
-}
-
-def winning_player(n1, n2):
-	n1 = user_score_list
-	n2 = dealer_score_list
-	is_greater_than_21(n1)		
-	if sum(n1) > sum(n2):
-		if sum(n1) < 21:
-			winner = (f" The winner is... YOU. your cards are:{players['user']}, with a total of {sum(user_score_list)}")
-			return winner
-		else:
-			winner = (f" The winner is... The dealer :'( Its cards are: {players['dealer']}, with a total of {sum(dealer_score_list)}")
-			return winner
-	else:
-		winner = (f" The winner is...The dealer :'( Its cards are: {players['dealer']}, with a total of {sum(dealer_score_list)}")
-		return winner
-	if sum(n1) < sum(n2):
-		if sum(n2) <21:
-			winner = (f" The winner is...The dealer :'( Its cards are: {players['dealer']}, with a total of {sum(dealer_score_list)}")
-			return winner
-		else:
-			winner = (f" The winner is... YOU. your cards are:{players['user']}, with a total of {sum(user_score_list)}")
-			return winner	
-	else:
-		winner = (f" The winner is... YOU. your cards are:{players['user']}, with a total of {sum(user_score_list)}")
-		return winner
 
 
-def is_greater_than_21(n1):
-	if sum(n1) > 21:
-		is_greater_21 = True
-		return is_greater_21
-	else:
-		is_greater_21 = False
-		return is_greater_21	
+def get_card(player):
+    """Return a random card value"""
+    cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+    card = random.choice(cards)
+    player.append(card)
+    return card
 
-def finish_game():
-	print(winning_player(user_score_list, dealer_score_list))
-	print(f" The dealer has: {dealer_score_list}, and a total of {sum(dealer_score_list)}.")
+
+def check_for_11(player):
+    '''check for the appearance of card"11" and, if total score > 21, replaces value to one.'''
+    if 11 in player:
+        if sum(player) > 21:
+            for item in player:
+                if item == 11:
+                    card_index = player.index(item)
+                    player[card_index] = 1
+                    return player
+
+
+def check_winner(n1, n2):
+    '''compare scores and and checks game logic to define winner'''
+    user_score = sum(n1)
+    dealer_score = sum(n2)
+    if user_score > 21 and dealer_score < 21:
+        winner = ("dealer")
+        return winner
+    elif user_score > 21 and dealer_score > 21:
+        winner = ("tie")
+        return winner
+    elif user_score < 21 and dealer_score < 21:
+        if user_score > dealer_score:
+            winner = ("user")
+            return winner
+        elif user_score < dealer_score:
+            winner = ("dealer")
+            return winner
+        elif user_score == dealer_score:
+            winner = ("tie")
+            return winner
+    elif user_score < 21 and dealer_score > 21:
+        winner = ("user")
+        return winner
+    elif user_score == 21 and dealer_score < 21:
+        winner = ("user")
+        return winner
+    elif user_score == 21 and dealer_score == 21:
+        winner = ("tie")
+        return winner
+    elif user_score == 21 and dealer_score > 21:
+        winner = ("user")
+        return winner
+    elif user_score > 21 and dealer_score == 21:
+        winner = ("dealer")
+        return winner
+    elif user_score < 21 and dealer_score == 21:
+        winner = ("dealer")
+        return winner
+
 
 def keep_playing():
-	end_of_game = False
-	is_greater_21 = False
-	while end_of_game == True:
-		finish_game()	
-	else:
-		is_greater_than_21(user_score_list)
-		if is_greater_21 == True:
-			end_of_game = True
-		else:
-			user_get_another_card(cards)
-			is_greater_than_21(user_score_list)
-			if is_greater_21 == True:
-				end_of_game = True
-			else:
-				is_greater_than_21(dealer_score_list)
-				if is_greater_21 == True:
-					end_of_game = True
-				else:
-					dealer_get_another_card(cards)	
+    while sum(user_score_list) < 21 and sum(dealer_score_list) < 21:
+        print(
+            f'Your total score is {sum(user_score_list)}, your cards are:{user_score_list}')
+        print(f"Dealer's first card is {dealer_first_card}")
+        should_continue = input(
+            "Type 'y' to get another card, type 'n' to pass: ")
+        if should_continue == 'y':
+            get_card(user_score_list)
+            if sum(dealer_score_list) <= 17:
+                get_card(dealer_score_list)
+        else:
+            if sum(dealer_score_list) <= 17:
+                get_card(dealer_score_list)
+                check_for_11(user_score_list)
+                check_for_11(dealer_score_list)
+                if sum(user_score_list) < 21 and sum(dealer_score_list) < 21:
+                    keep_playing()
+                    # print( f'The winner is {check_winner(user_score_list, dealer_score_list)}')
+            else:
+                if should_continue == 'n':
+                    check_for_11(user_score_list)
+                    check_for_11(dealer_score_list)
+                    print(
+                        f'The winner is {check_winner(user_score_list, dealer_score_list)}')
+                    break
+    else:
+        check_for_11(user_score_list)
+        check_for_11(dealer_score_list)
+        if sum(user_score_list) < 21 and sum(dealer_score_list) < 21:
+            keep_playing()
+        else:
+            return print(f'The winner is {check_winner(user_score_list, dealer_score_list)}')
 
-			print(f" Your cards: {user_score_list}, current score: {sum(user_score_list)}, dealer's first card is {dealer_first_card}")
-			should_continue = input("Type 'y' to get another card, type 'n' to pass: ")
-			if should_continue == "y":
-				keep_playing()
-			else:
-				finish_game()
-start_game = input("Do you want to play a game of Blackjack? Type 'y' or 'n': ")
-if start_game == "y":
-	user_get_another_card(cards)
-	dealer_first_card = dealer_get_another_card(cards)
-	# user_get_another_card(cards)
-	#end_of_game = False
-	keep_playing()
-else:
-	finish_game()		
+
+start_game = input(
+    "Do you want to play a game of Blackjack? Type 'y' or 'n': ")
+if start_game == 'y':
+    get_card(user_score_list)
+    dealer_first_card = get_card(dealer_score_list)
+    get_card(user_score_list)
+    keep_playing()
+
+print(
+    f'User score list = {user_score_list} /n Dealer score list = {dealer_score_list}')	
+		
 
 	
 		
 	
-
-
 
 
 
